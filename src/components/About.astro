@@ -1,0 +1,8 @@
+---
+import { site } from '../content/site';
+import SectionLabel from './SectionLabel.astro';
+---
+<section>
+  <SectionLabel text="About" />
+  {site.bio.map((p) => <p class="mb-2.5 text-sm leading-[1.65] text-body">{p}</p>)}
+</section>

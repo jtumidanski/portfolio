@@ -1,0 +1,11 @@
+---
+import { site } from '../content/site';
+import AppCard from './AppCard.astro';
+import SectionLabel from './SectionLabel.astro';
+---
+<section>
+  <SectionLabel text="What I run" />
+  <ul class="grid grid-cols-1 items-stretch gap-3.5 min-[480px]:grid-cols-2 md:grid-cols-3">
+    {site.apps.map((app) => <AppCard app={app} />)}
+  </ul>
+</section>
