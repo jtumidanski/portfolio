@@ -17,9 +17,12 @@ describe('copy is HTML-escaped', () => {
     symlinkSync(join(root, 'node_modules'), join(sandbox, 'node_modules'));
     const content = join(sandbox, 'src/content/site.ts');
     const src = readFileSync(content, 'utf8')
-      .replace(/tagline: '[^']*'/, "tagline: 'Hostile <b>tag</b> & ampersand'")
+      .replace(/tagline:\s*'[^']*'/, "tagline: 'Hostile <b>tag</b> & ampersand'")
       // Also the first bio paragraph, rendered by a different component.
-      .replace(/bio: \[\n\s*'[^']*'/, "bio: [\n    'Bio <i>para</i> & more'");
+      .replace(/bio:\s*\[\s*'[^']*'/, "bio: [\n    'Bio <i>para</i> & more'");
+    if (!src.includes('Hostile <b>tag</b>') || !src.includes('Bio <i>para</i>')) {
+      throw new Error('fixture substitution did not match site.ts; update the regexes');
+    }
     writeFileSync(content, src);
     // Run from inside the sandbox: Astro keeps its prerender staging dir
     // relative to cwd, and a cwd on another filesystem than the outDir
