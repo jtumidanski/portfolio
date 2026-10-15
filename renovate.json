@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["local>renovate/presets"],
+  "enabledManagers": ["npm", "github-actions", "dockerfile"],
+  "automerge": false,
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "7 days",
+  "packageRules": [
+    { "matchManagers": ["npm"], "matchUpdateTypes": ["minor", "patch"], "groupName": "npm dependencies (non-major)" },
+    { "matchManagers": ["github-actions"], "matchUpdateTypes": ["minor", "patch"], "groupName": "GitHub Actions (non-major)" },
+    { "matchManagers": ["dockerfile"], "matchUpdateTypes": ["patch"], "groupName": "Dockerfile base images (patch)" },
+    { "matchUpdateTypes": ["major"], "automerge": false, "labels": ["dependencies", "major"] }
+  ],
+  "osvVulnerabilityAlerts": true
+}
