@@ -45,7 +45,7 @@ export const site: Site = {
     {
       name: 'home-hub',
       description: 'Household dashboard: calendar, recipes, shopping, packages, workouts.',
-      liveUrl: 'https://homehub.tumidanski.com',
+      liveUrl: 'https://home-hub.tumidanski.com',
       sourceUrl: 'https://github.com/jtumidanski/home-hub',
     },
     {
