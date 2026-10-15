@@ -1,0 +1,8 @@
+---
+import { site } from '../content/site';
+const year = new Date().getFullYear();
+---
+<footer class="mt-9 flex justify-between border-t border-rule pt-4 text-xs text-dim">
+  <span>© {year} {site.name}</span>
+  <a href={site.footer.k3sRepoUrl} target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">Self-hosted on k3s ↗</a>
+</footer>

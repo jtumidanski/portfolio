@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Synced by Argo CD Application portfolio-main (k3s repo,
+# bee/argocd-apps/portfolio.yml). The bump-overlay job in
+# .forgejo/workflows/main.yml rewrites newTag to each merged commit's SHA.
+namespace: portfolio
+
+resources:
+  - ../../base
+
+images:
+  - name: registry.tumidanski/jtumidanski/portfolio
+    # Placeholder until the first main run pins a real SHA. Not numeric on
+    # purpose: kustomize rejects an unquoted all-digit tag as a number.
+    newTag: unpinned

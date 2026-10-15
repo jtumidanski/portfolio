@@ -81,7 +81,7 @@ Seed values:
 - `stack`: Go, TypeScript, React, Kubernetes, PostgreSQL, Kafka, Traefik,
   Argo CD. Drawn from what the owner's repos actually use.
 - `apps`, in this order:
-  1. home-hub — `https://homehub.tumidanski.com` —
+  1. home-hub — `https://home-hub.tumidanski.com` —
      `https://github.com/jtumidanski/home-hub`
   2. MyFleet — `https://myfleet.tumidanski.com` —
      `https://github.com/jtumidanski/MyFleet`
@@ -257,19 +257,19 @@ of those.
 Order chosen by the owner: move home-hub first, then land the portfolio.
 
 1. **home-hub PR.** In `deploy/k8s/ingress.yaml`, change the second rule's
-   host from `tumidanski.com` to `homehub.tumidanski.com`. Nothing else in
+   host from `tumidanski.com` to `home-hub.tumidanski.com`. Nothing else in
    home-hub references the domain (verified by grep across Go, TypeScript,
    YAML, and Markdown), so auth cookies are host-scoped and existing sessions
    simply require a fresh login at the new host.
 2. **Out-of-band, done by the owner before merging step 1:**
-   - DNS: an A or CNAME record for `homehub.tumidanski.com` pointing at the
+   - DNS: an A or CNAME record for `home-hub.tumidanski.com` pointing at the
      same public endpoint as `tumidanski.com`.
-   - nginx-proxy-manager: a proxy host for `homehub.tumidanski.com`
+   - nginx-proxy-manager: a proxy host for `home-hub.tumidanski.com`
      forwarding to the cluster Traefik, with a Let's Encrypt certificate
      requested. nginx-proxy-manager state lives in its database, not in git,
      so this is a UI step.
-   - Add a `homehub.tumidanski.com` monitor to uptime-kuma.
-3. Merge step 1. Verify home-hub at `https://homehub.tumidanski.com`.
+   - Add a `home-hub.tumidanski.com` monitor to uptime-kuma.
+3. Merge step 1. Verify home-hub at `https://home-hub.tumidanski.com`.
    Between this point and step 4, `https://tumidanski.com` returns a 404
    from Traefik. The owner accepted that gap.
 4. **k3s PR.** Add `bee/argocd-apps/portfolio.yml` and the uptime-kuma

@@ -1,0 +1,120 @@
+name: Main - Build, Publish, Deploy
+
+# On every push to main: verify, build the image tagged with the commit SHA,
+# push it to zot, then pin that SHA into the kustomize overlay so Argo CD
+# rolls the Deployment. Modelled on MyFleet's main.yml; see that file for the
+# reasoning behind each guard.
+
+on:
+  push:
+    branches: [main]
+    # Guard 1 of 2 against a self-retrigger loop: bump-overlay pushes a commit
+    # that touches only this path. Guard 2 is [skip ci] in its message. The
+    # convergence check inside bump-overlay is what actually terminates it.
+    paths-ignore:
+      - 'deploy/k8s/overlays/main/**'
+
+env:
+  REGISTRY: registry.tumidanski
+  IMAGE: registry.tumidanski/jtumidanski/portfolio
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      npm_config_cache: /work/ci-cache/npm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Reset toolchain caches
+        run: rm -rf /work/ci-cache
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Cache npm cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: /work/ci-cache/npm
+          key: npm-linux-x64-24-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check
+      - run: npm test
+      - name: Check manifests
+        run: tools/check-manifests.sh
+
+  # Runs concurrently with verify. A SHA-tagged image is inert until
+  # bump-overlay writes the SHA into the overlay, and bump-overlay needs verify.
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select an amd64 BuildKit replica
+        id: amd64
+        uses: https://git.tumidanski/ci/actions/select-amd64-builder@v1
+        with:
+          index: 0
+
+      - name: Build and push
+        uses: https://git.tumidanski/ci/actions/buildx-build@v1
+        with:
+          context: .
+          dockerfile: Dockerfile
+          image: ${{ env.IMAGE }}
+          tags: ${{ github.sha }}
+          platform: linux/amd64
+          buildkit-endpoint: ${{ steps.amd64.outputs.endpoint }}
+          push: 'true'
+          registry: ${{ env.REGISTRY }}
+          registry-username: ci
+          registry-password: ${{ secrets.ZOT_CI_PASSWORD }}
+          cache-scope: portfolio-amd64
+
+  bump-overlay:
+    needs: [verify, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # MUST be `ref: main`: a push-event checkout is a detached HEAD and
+          # `git push` from one fails outright.
+          ref: main
+          token: ${{ secrets.FORGE_PUSH_TOKEN }}
+
+      - name: Pin overlay image to this commit
+        run: |
+          set -euo pipefail
+          f=deploy/k8s/overlays/main/kustomization.yaml
+
+          # Convergence guard: a bot push re-triggers this workflow on
+          # Forgejo, so if the overlay already pins this SHA there is nothing
+          # to do.
+          if grep -q "    newTag: ${{ github.sha }}" "$f"; then
+            echo "overlay already pinned to ${{ github.sha }} — converged"
+            exit 0
+          fi
+
+          # Stale-run guard: if main moved past this commit while this run
+          # was in flight, pinning would roll the overlay backwards.
+          tip="$(git rev-parse HEAD)"
+          if [ "$tip" != "${{ github.sha }}" ]; then
+            echo "main's tip is now $tip, not ${{ github.sha }} — skipping to avoid pinning a stale SHA"
+            exit 0
+          fi
+
+          sed -i -E "s/^(    newTag: ).*$/\1${{ github.sha }}/" "$f"
+          if git diff --quiet "$f"; then
+            echo "nothing to bump"
+            exit 0
+          fi
+          test "$(grep -c "    newTag: ${{ github.sha }}" "$f")" -eq 1
+
+          git config user.name  "forge-bot"
+          git config user.email "forge-bot@git.tumidanski"
+          git add "$f"
+          git commit -m "chore(deploy): pin main overlay to ${{ github.sha }} [skip ci]"
+          git push origin main

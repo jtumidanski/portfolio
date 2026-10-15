@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+
+/* Nord. Dark is the default; light only when the visitor asks for it. */
+:root {
+  --bg: #2E3440;        /* nord0 */
+  --card: #3B4252;      /* nord1 */
+  --cardb: #434C5E;     /* nord2 */
+  --rule: #3B4252;      /* nord1 */
+  --fg: #ECEFF4;        /* nord6 */
+  --body: #D8DEE9;      /* nord4 */
+  --muted: #D8DEE9;     /* nord4 */
+  --dim: #9aa5b8;
+  --accent: #88C0D0;    /* nord8 */
+  --accent-fg: #2E3440; /* nord0 */
+  --avatar-from: #5E81AC; /* nord10 */
+  --avatar-to: #88C0D0;   /* nord8 */
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #ECEFF4;        /* nord6 */
+    --card: #E5E9F0;      /* nord5 */
+    --cardb: #D8DEE9;     /* nord4 */
+    --rule: #D8DEE9;      /* nord4 */
+    --fg: #2E3440;        /* nord0 */
+    --body: #3B4252;      /* nord1 */
+    --muted: #4C566A;     /* nord3 */
+    --dim: #6b7589;
+    --accent: #5E81AC;    /* nord10 */
+    --accent-fg: #ECEFF4; /* nord6 */
+    --avatar-from: #5E81AC; /* nord10 */
+    --avatar-to: #81A1C1;   /* nord9 */
+    color-scheme: light;
+  }
+}
+
+@theme inline {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-cardb: var(--cardb);
+  --color-rule: var(--rule);
+  --color-fg: var(--fg);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-dim: var(--dim);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+}
+
+html { background: var(--bg); color: var(--fg); font-family: var(--font-sans); }

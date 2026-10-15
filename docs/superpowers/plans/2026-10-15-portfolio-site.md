@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship a single-page Astro portfolio at `https://tumidanski.com`, built and deployed to the bee k3s cluster from the forge on every push to `main`, and move home-hub to `homehub.tumidanski.com`.
+**Goal:** Ship a single-page Astro portfolio at `https://tumidanski.com`, built and deployed to the bee k3s cluster from the forge on every push to `main`, and move home-hub to `home-hub.tumidanski.com`.
 
 **Architecture:** A static Astro site (no client JS) whose copy lives in one typed content file. CI builds an nginx image tagged with the commit SHA, pushes it to the zot registry, and pins that SHA into a kustomize overlay that Argo CD syncs. Three repos change: `portfolio` (new, everything), `home-hub` (one ingress host), `k3s` (Argo Application, uptime monitor, mirror line).
 
@@ -467,7 +467,7 @@ export const site: Site = {
     {
       name: 'home-hub',
       description: 'Household dashboard: calendar, recipes, shopping, packages, workouts.',
-      liveUrl: 'https://homehub.tumidanski.com',
+      liveUrl: 'https://home-hub.tumidanski.com',
       sourceUrl: 'https://github.com/jtumidanski/home-hub',
     },
     {
@@ -1081,7 +1081,7 @@ spec:
 # No tls block on purpose: nginx-proxy-manager holds the Let's Encrypt
 # certificate for tumidanski.com and forwards plain HTTP to the cluster's
 # Traefik, which routes by Host. Same arrangement home-hub used for the root
-# domain before it moved to homehub.tumidanski.com.
+# domain before it moved to home-hub.tumidanski.com.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -1376,21 +1376,21 @@ Then check the run: `tea pr <number>` and the Actions tab at `https://git.tumida
 
 ---
 
-### Task 8: Move home-hub to homehub.tumidanski.com
+### Task 8: Move home-hub to home-hub.tumidanski.com
 
 **Files:**
 - Modify: `/home/tumidanski/source/home-hub/deploy/k8s/ingress.yaml:207`
 
 **Interfaces:**
-- Produces: home-hub reachable at `https://homehub.tumidanski.com`; `tumidanski.com` free for Task 9.
+- Produces: home-hub reachable at `https://home-hub.tumidanski.com`; `tumidanski.com` free for Task 9.
 
 - [ ] **Step 1: Owner prerequisites, done by hand before merging**
 
 These cannot be done from this machine. Ask the owner to confirm each:
 
-1. DNS: `homehub.tumidanski.com` A or CNAME record pointing at the same public endpoint as `tumidanski.com`.
-2. nginx-proxy-manager: a proxy host for `homehub.tumidanski.com` forwarding to the same upstream as the existing `tumidanski.com` host, with a Let's Encrypt certificate requested and "Force SSL" matching the existing entry.
-3. Optional sanity check before merging: with the DNS record live, `curl -sk -H 'Host: homehub.tumidanski.com' https://<public-ip>/` should reach Traefik and return a 404 (no ingress yet), proving the proxy path works.
+1. DNS: `home-hub.tumidanski.com` A or CNAME record pointing at the same public endpoint as `tumidanski.com`.
+2. nginx-proxy-manager: a proxy host for `home-hub.tumidanski.com` forwarding to the same upstream as the existing `tumidanski.com` host, with a Let's Encrypt certificate requested and "Force SSL" matching the existing entry.
+3. Optional sanity check before merging: with the DNS record live, `curl -sk -H 'Host: home-hub.tumidanski.com' https://<public-ip>/` should reach Traefik and return a 404 (no ingress yet), proving the proxy path works.
 
 - [ ] **Step 2: Branch and edit the ingress**
 
@@ -1400,7 +1400,7 @@ git checkout main && git pull
 git checkout -b chore/move-to-homehub-subdomain
 ```
 
-Edit `deploy/k8s/ingress.yaml` line 207: change `        - host: tumidanski.com` to `        - host: homehub.tumidanski.com`. Nothing else changes; the TLS block only lists the `.me` host and stays as is.
+Edit `deploy/k8s/ingress.yaml` line 207: change `        - host: tumidanski.com` to `        - host: home-hub.tumidanski.com`. Nothing else changes; the TLS block only lists the `.me` host and stays as is.
 
 - [ ] **Step 3: Verify the diff and render**
 
@@ -1415,12 +1415,12 @@ Expected: one file, one changed line, `ingress.networking.k8s.io/home-hub config
 - [ ] **Step 4: Commit, push, PR, merge**
 
 ```bash
-git commit -am "chore(deploy): serve home-hub at homehub.tumidanski.com, freeing the root domain
+git commit -am "chore(deploy): serve home-hub at home-hub.tumidanski.com, freeing the root domain
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 git push -u origin chore/move-to-homehub-subdomain
-printf 'Moves the public host from tumidanski.com to homehub.tumidanski.com so the root can serve the portfolio site. Requires the DNS record and nginx-proxy-manager proxy host for homehub.tumidanski.com to exist first.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n' > /tmp/hh-pr.md
-tea pr create --base main --head chore/move-to-homehub-subdomain --title "Move public host to homehub.tumidanski.com" --description-file /tmp/hh-pr.md
+printf 'Moves the public host from tumidanski.com to home-hub.tumidanski.com so the root can serve the portfolio site. Requires the DNS record and nginx-proxy-manager proxy host for home-hub.tumidanski.com to exist first.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n' > /tmp/hh-pr.md
+tea pr create --base main --head chore/move-to-homehub-subdomain --title "Move public host to home-hub.tumidanski.com" --description-file /tmp/hh-pr.md
 ```
 Merge once the owner confirms step 1. Argo CD (`home-hub` Application) syncs it.
 
@@ -1428,7 +1428,7 @@ Merge once the owner confirms step 1. Argo CD (`home-hub` Application) syncs it.
 
 Run:
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://homehub.tumidanski.com/
+curl -s -o /dev/null -w "%{http_code}\n" https://home-hub.tumidanski.com/
 curl -s -o /dev/null -w "%{http_code}\n" https://tumidanski.com/
 ```
 Expected: `200` for homehub; `404` for the root (Traefik has no route yet). Log in to home-hub at the new host and confirm it works.
@@ -1505,7 +1505,7 @@ If `root.yml` (or another file) lists `myfleet.yml` explicitly, add `portfolio.y
 In `bee/uptime-kuma/monitors.yaml`, in the `Web` group after the `home-hub` line, add:
 ```yaml
       - { name: portfolio,    type: http, url: "https://tumidanski.com" }
-      - { name: home-hub-com, type: http, url: "https://homehub.tumidanski.com" }
+      - { name: home-hub-com, type: http, url: "https://home-hub.tumidanski.com" }
 ```
 These go through the public path (nginx-proxy-manager, real certificate) so no `ignoreTls`.
 
@@ -1529,7 +1529,7 @@ git commit -m "feat(apps): portfolio-main Argo app, monitors, GitHub mirror
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 git push -u origin feat/portfolio-app
-printf 'Adds the portfolio-main Argo CD Application (syncs jtumidanski/portfolio main into the portfolio namespace), uptime-kuma monitors for tumidanski.com and homehub.tumidanski.com, and the GitHub push-mirror line.\n\nPrerequisites: home-hub PR moving off the root domain is merged; the portfolio repo is public on the forge; empty jtumidanski/portfolio exists on GitHub.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n' > /tmp/k3s-pr.md
+printf 'Adds the portfolio-main Argo CD Application (syncs jtumidanski/portfolio main into the portfolio namespace), uptime-kuma monitors for tumidanski.com and home-hub.tumidanski.com, and the GitHub push-mirror line.\n\nPrerequisites: home-hub PR moving off the root domain is merged; the portfolio repo is public on the forge; empty jtumidanski/portfolio exists on GitHub.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n' > /tmp/k3s-pr.md
 tea pr create --base master --head feat/portfolio-app --title "Add portfolio site to the cluster" --description-file /tmp/k3s-pr.md
 ```
 Merge after Task 8 step 5 is verified.

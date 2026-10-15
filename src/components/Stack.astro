@@ -1,0 +1,12 @@
+---
+import { site } from '../content/site';
+import SectionLabel from './SectionLabel.astro';
+---
+<section>
+  <SectionLabel text="Stack" />
+  <ul class="flex flex-wrap gap-2">
+    {site.stack.map((s) => (
+      <li class="rounded-full border border-cardb bg-card px-2.5 py-1 text-xs text-body">{s}</li>
+    ))}
+  </ul>
+</section>
