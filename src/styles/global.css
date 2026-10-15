@@ -27,8 +27,8 @@
     --fg: #2E3440;        /* nord0 */
     --body: #3B4252;      /* nord1 */
     --muted: #4C566A;     /* nord3 */
-    --dim: #6b7589;
-    --accent: #5E81AC;    /* nord10 */
+    --dim: #5A6577;       /* darkened for 4.5:1 on nord6 */
+    --accent: #44679A;    /* nord10 darkened for 4.5:1 on nord6 (nord10 itself is 3.5:1) */
     --accent-fg: #ECEFF4; /* nord6 */
     --avatar-from: #5E81AC; /* nord10 */
     --avatar-to: #81A1C1;   /* nord9 */

@@ -7,7 +7,8 @@ export interface Social {
 export interface App {
   name: string;
   description: string;
-  liveUrl: string;
+  /** Public instance. Omit for apps with no public URL; the card then shows Source only. */
+  liveUrl?: string;
   sourceUrl: string;
 }
 
@@ -26,17 +27,17 @@ export interface Site {
 
 // Everything a visitor reads lives here. Placeholders are marked TODO(owner).
 export const site: Site = {
-  name: 'J. Tumidanski', // TODO(owner): real display name
-  title: 'Software Engineer', // TODO(owner)
+  name: 'Justin Tumidanski',
+  title: 'Software Engineer and Manager',
   tagline: 'I build backend systems in Go and run a small homelab on k3s. This is my corner of the internet.', // TODO(owner)
   bio: [
     'TODO(owner): Paragraph one. Who you are, what you work on day to day, and what you care about in software.',
     'TODO(owner): Paragraph two. The homelab, the side projects, and why you self-host.',
   ],
   photo: '/me.jpg',
-  photoAlt: 'Portrait of J. Tumidanski',
+  photoAlt: 'Portrait of Justin Tumidanski',
   socials: [
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jtumidanski', icon: 'linkedin' }, // TODO(owner): confirm URL
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/justin-tumidanski-61165730', icon: 'linkedin' },
     { label: 'GitHub', href: 'https://github.com/jtumidanski', icon: 'github' },
     { label: 'Email', href: 'mailto:jtumidanski@gmail.com', icon: 'email' },
   ],
@@ -58,7 +59,7 @@ export const site: Site = {
     {
       name: 'Harbormaster',
       description: 'Admin console for S3-compatible object stores.',
-      liveUrl: 'https://harbormaster.tumidanski.com', // TODO(owner): confirm public URL
+      // No public instance; source only.
       sourceUrl: 'https://github.com/jtumidanski/Harbormaster',
     },
   ],

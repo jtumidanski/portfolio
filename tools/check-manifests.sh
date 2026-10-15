@@ -42,9 +42,14 @@ echo "==> ingress host"
 grep -qE '^[[:space:]]*- host: tumidanski.com$' "$out" && note "host tumidanski.com" || bad "ingress host is not tumidanski.com"
 grep -qE '^[[:space:]]*tls:' "$out" && bad "ingress carries a tls block (nginx-proxy-manager terminates TLS)" || note "no tls block"
 
+echo "==> kubeconform"
 if command -v kubeconform >/dev/null; then
-  echo "==> kubeconform"
   kubeconform -strict -summary "$out" || bad "kubeconform"
+else
+  # Loud, not fatal: the forge runner image does not ship kubeconform yet
+  # (tracked in the k3s repo). Schema validation still runs on every
+  # developer machine that has it.
+  echo "  WARN: kubeconform not on PATH; schema validation SKIPPED"
 fi
 
 [ "$fail" -eq 0 ] && echo "OK" || { echo "FAILED"; exit 1; }

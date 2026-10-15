@@ -25,18 +25,18 @@ describe('built index.html', () => {
     }
   });
 
-  it('renders every app with Open and Source links that open safely', () => {
+  it('renders every app with Source, and Open only when there is a live URL', () => {
+    const safeLink = (href: string) =>
+      new RegExp(`<a[^>]*href="${escapeAttr(href)}"[^>]*target="_blank"[^>]*rel="noopener noreferrer"[^>]*>`);
     for (const a of site.apps) {
       expect(html).toContain(a.name);
-      const open = new RegExp(
-        `<a[^>]*href="${escapeAttr(a.liveUrl)}"[^>]*target="_blank"[^>]*rel="noopener noreferrer"[^>]*>`,
-      );
-      const source = new RegExp(
-        `<a[^>]*href="${escapeAttr(a.sourceUrl)}"[^>]*target="_blank"[^>]*rel="noopener noreferrer"[^>]*>`,
-      );
-      expect(html, `Open link for ${a.name}`).toMatch(open);
-      expect(html, `Source link for ${a.name}`).toMatch(source);
+      expect(html, `Source link for ${a.name}`).toMatch(safeLink(a.sourceUrl));
+      if (a.liveUrl !== undefined) {
+        expect(html, `Open link for ${a.name}`).toMatch(safeLink(a.liveUrl));
+      }
     }
+    const openCount = (html.match(/>Open ↗</g) ?? []).length;
+    expect(openCount).toBe(site.apps.filter((a) => a.liveUrl !== undefined).length);
   });
 
   it('renders every stack chip', () => {

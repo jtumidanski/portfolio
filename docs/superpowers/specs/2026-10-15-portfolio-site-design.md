@@ -56,7 +56,7 @@ export interface Social { label: string; href: string; icon: 'linkedin' | 'githu
 export interface App {
   name: string;
   description: string;   // one or two sentences
-  liveUrl: string;       // the running instance
+  liveUrl?: string;      // the running instance; omitted when there is no public one
   sourceUrl: string;     // the GitHub repo
 }
 export interface Site {
@@ -114,8 +114,10 @@ on desktop, 20px on mobile. Sections top to bottom:
    bottom with `margin-top: auto`. Cards in a row stretch to equal height so
    the button rows of all cards in a row align regardless of description
    length. This was an explicit review requirement.
-   Buttons: **Open** (filled, accent) opens `liveUrl`; **Source** (outlined)
-   opens `sourceUrl`. Both open in a new tab with `rel="noopener noreferrer"`.
+   Buttons: **Open** (filled, accent) opens `liveUrl` and is omitted when the
+   app has none (amended 2026-10-15: Harbormaster has no public instance, and
+   a dead Open link is worse than no button); **Source** (outlined) opens
+   `sourceUrl`. Both open in a new tab with `rel="noopener noreferrer"`.
 4. **Footer.** Left: "© {year} {name}". Right: "Self-hosted on k3s" linking to
    the k3s repo on GitHub.
 
@@ -135,8 +137,12 @@ no preference. No toggle.
 | section rule | `#3B4252` | `#D8DEE9` |
 | heading text | `#ECEFF4` | `#2E3440` |
 | body text | `#D8DEE9` | `#3B4252` |
-| muted text | `#D8DEE9` at reduced emphasis / `#9aa5b8` for dim | `#4C566A` / `#6b7589` |
-| accent | `#88C0D0` (nord8) | `#5E81AC` (nord10) |
+| muted text | `#D8DEE9` at reduced emphasis / `#9aa5b8` for dim | `#4C566A` / `#5A6577` for dim |
+| accent | `#88C0D0` (nord8) | `#44679A` (nord10 darkened) |
+
+Amended 2026-10-15 after review: the light accent and dim values are darkened
+from nord10 `#5E81AC` and `#6b7589` so every text/background pair meets WCAG
+AA 4.5:1 (nord10 on nord6 is 3.5:1). `test/contrast.test.ts` pins this.
 | accent foreground | `#2E3440` | `#ECEFF4` |
 | avatar fallback gradient | nord10 → nord8 | nord10 → nord9 |
 
@@ -156,10 +162,14 @@ owner's initials in Nord colors ships in `public/`. `lang="en"`.
 `Dockerfile` at the repo root, same shape as home-hub's frontend:
 
 - Stage 1 `node:24-alpine`: `npm ci`, `npm run build` → `dist/`.
-- Stage 2 `nginx:alpine`: copy `dist/` to `/usr/share/nginx/html`, copy
-  `nginx.conf` to `/etc/nginx/conf.d/default.conf`, expose 80.
+- Stage 2 `nginxinc/nginx-unprivileged:alpine` (amended 2026-10-15 after
+  review; MyFleet's `web` is the reference): runs as uid 101, copy `dist/` to
+  `/usr/share/nginx/html`, copy `nginx.conf` to
+  `/etc/nginx/conf.d/default.conf`, expose 8080. The Deployment runs it with
+  `runAsNonRoot`, `readOnlyRootFilesystem`, all capabilities dropped, and a
+  tmpfs on `/tmp`.
 
-`nginx.conf`: `listen 80`, `root /usr/share/nginx/html`, `try_files $uri
+`nginx.conf`: `listen 8080`, `root /usr/share/nginx/html`, `try_files $uri
 $uri/ =404` (no SPA fallback; it is a static site), `/_astro/` served with
 `Cache-Control: public, max-age=31536000, immutable`, everything else
 `Cache-Control: public, max-age=300`. Gzip on for text types.
@@ -218,7 +228,7 @@ deploy/k8s/
   base/
     kustomization.yaml
     namespace.yaml      # portfolio
-    deployment.yaml     # 1 replica, image registry.tumidanski/jtumidanski/portfolio:latest-placeholder
+    deployment.yaml     # 1 replica, image registry.tumidanski/jtumidanski/portfolio:latest
     service.yaml        # ClusterIP :80
     ingress.yaml        # host tumidanski.com, path / Prefix -> service:80
   overlays/
