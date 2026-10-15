@@ -49,6 +49,15 @@ jobs:
         with:
           index: 0
 
+      # push is false, but the buildx registry cache (cache-scope) still
+      # writes to zot, and an anonymous write is rejected.
+      - name: Log in to the registry (for the buildx registry cache)
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: registry.tumidanski
+          username: ci
+          password: ${{ secrets.ZOT_CI_PASSWORD }}
+
       - name: Build image (no push)
         uses: https://git.tumidanski/ci/actions/buildx-build@v1
         with:

@@ -21,7 +21,11 @@ describe('copy is HTML-escaped', () => {
       "tagline: 'Hostile <b>tag</b> & ampersand'",
     );
     writeFileSync(content, src);
-    execFileSync('npx', ['astro', 'build', '--root', sandbox], { cwd: root, stdio: 'pipe' });
+    // Run from inside the sandbox: Astro keeps its prerender staging dir
+    // relative to cwd, and a cwd on another filesystem than the outDir
+    // fails the final rename with EXDEV (seen on the CI runners, whose
+    // workspace and /tmp are different mounts).
+    execFileSync(join(root, 'node_modules/.bin/astro'), ['build'], { cwd: sandbox, stdio: 'pipe' });
     const html = readFileSync(join(sandbox, 'dist/index.html'), 'utf8');
     // Rendered as a text node: entities, never an element.
     expect(html).toContain('>Hostile &lt;b&gt;tag&lt;/b&gt; &amp; ampersand<');
