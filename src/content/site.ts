@@ -7,7 +7,8 @@ export interface Social {
 export interface App {
   name: string;
   description: string;
-  liveUrl: string;
+  /** Public instance. Omit for apps with no public URL; the card then shows Source only. */
+  liveUrl?: string;
   sourceUrl: string;
 }
 
@@ -26,17 +27,21 @@ export interface Site {
 
 // Everything a visitor reads lives here. Placeholders are marked TODO(owner).
 export const site: Site = {
-  name: 'J. Tumidanski', // TODO(owner): real display name
-  title: 'Software Engineer', // TODO(owner)
-  tagline: 'I build backend systems in Go and run a small homelab on k3s. This is my corner of the internet.', // TODO(owner)
+  name: 'Justin Tumidanski',
+  title: 'Software Engineer and Manager',
+  tagline:
+    'Engineering leader building software for warehouse automation by day, and a homelab tinkerer by night. This is my corner of the internet.',
   bio: [
-    'TODO(owner): Paragraph one. Who you are, what you work on day to day, and what you care about in software.',
-    'TODO(owner): Paragraph two. The homelab, the side projects, and why you self-host.',
+    'I’m a software engineering leader with over a decade of experience building products, leading teams, and solving complex technical challenges. My career has taken me through software development, DevOps, product ownership, and engineering management, giving me a broad perspective on how successful software gets built, from the initial idea through architecture, implementation, and delivery.',
+    'Currently, I’m an Engineering Manager at Dematic, where I lead teams developing software solutions for warehouse automation and fulfillment operations. My work spans mobile applications, distributed systems, cloud technologies, and modern software architecture.',
+    'I enjoy working at the intersection of technology, people, and product strategy. Whether it’s helping engineers grow, modernizing legacy systems, or turning ambiguous business problems into actionable technical solutions, I’m motivated by building things that make a meaningful difference.',
+    'Outside of work, I’m a technology enthusiast who enjoys experimenting with infrastructure, self-hosted services, and new development tools. I maintain a personal homelab where I explore Kubernetes, virtualization, automation, and whatever else catches my interest.',
+    'When I’m not behind a keyboard, you’ll probably find me running, working on cars, or finding another project to keep myself busy.',
   ],
   photo: '/me.jpg',
-  photoAlt: 'Portrait of J. Tumidanski',
+  photoAlt: 'Portrait of Justin Tumidanski',
   socials: [
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jtumidanski', icon: 'linkedin' }, // TODO(owner): confirm URL
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/justin-tumidanski-61165730', icon: 'linkedin' },
     { label: 'GitHub', href: 'https://github.com/jtumidanski', icon: 'github' },
     { label: 'Email', href: 'mailto:jtumidanski@gmail.com', icon: 'email' },
   ],
@@ -58,7 +63,7 @@ export const site: Site = {
     {
       name: 'Harbormaster',
       description: 'Admin console for S3-compatible object stores.',
-      liveUrl: 'https://harbormaster.tumidanski.com', // TODO(owner): confirm public URL
+      // No public instance; source only.
       sourceUrl: 'https://github.com/jtumidanski/Harbormaster',
     },
   ],

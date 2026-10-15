@@ -39,12 +39,21 @@ describe('site content', () => {
     for (const a of site.apps) {
       expect(a.name.trim()).not.toBe('');
       expect(a.description.trim()).not.toBe('');
-      expect(isAbsolute(a.liveUrl), a.liveUrl).toBe(true);
       expect(isAbsolute(a.sourceUrl), a.sourceUrl).toBe(true);
-      expect(a.liveUrl.startsWith('https:')).toBe(true);
       expect(a.sourceUrl.startsWith('https:')).toBe(true);
+      // liveUrl is optional (apps with no public instance), but never empty
+      // or relative when present.
+      if (a.liveUrl !== undefined) {
+        expect(isAbsolute(a.liveUrl), a.liveUrl).toBe(true);
+        expect(a.liveUrl.startsWith('https:')).toBe(true);
+      }
     }
     expect(new Set(site.apps.map((a) => a.name)).size).toBe(site.apps.length);
+  });
+
+  it('has at least one app with a live URL and one without', () => {
+    expect(site.apps.some((a) => a.liveUrl !== undefined)).toBe(true);
+    expect(site.apps.some((a) => a.liveUrl === undefined)).toBe(true);
   });
 
   it('links the k3s repo in the footer', () => {

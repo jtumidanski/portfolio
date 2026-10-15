@@ -7,12 +7,14 @@ const { app } = Astro.props;
   <h3 class="text-[15px] font-semibold text-fg">{app.name}</h3>
   <p class="mt-1.5 mb-3.5 flex-1 text-[13px] leading-relaxed text-muted">{app.description}</p>
   <div class="mt-auto flex gap-2">
-    <a
-      href={app.liveUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="rounded-lg bg-accent px-2.5 py-1.5 text-xs font-semibold text-accent-fg transition-opacity hover:opacity-90"
-    >Open ↗</a>
+    {app.liveUrl && (
+      <a
+        href={app.liveUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="rounded-lg bg-accent px-2.5 py-1.5 text-xs font-semibold text-accent-fg transition-opacity hover:opacity-90"
+      >Open ↗</a>
+    )}
     <a
       href={app.sourceUrl}
       target="_blank"
