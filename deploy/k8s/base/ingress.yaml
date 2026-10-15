@@ -1,0 +1,20 @@
+# No tls block on purpose: nginx-proxy-manager holds the Let's Encrypt
+# certificate for tumidanski.com and forwards plain HTTP to the cluster's
+# Traefik, which routes by Host. Same arrangement home-hub used for the root
+# domain before it moved to homehub.tumidanski.com.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: portfolio
+spec:
+  rules:
+    - host: tumidanski.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portfolio
+                port:
+                  number: 80
