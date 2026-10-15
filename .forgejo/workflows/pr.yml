@@ -1,0 +1,62 @@
+name: PR - Validate
+
+on:
+  pull_request:
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    env:
+      npm_config_cache: /work/ci-cache/npm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Reset toolchain caches
+        run: rm -rf /work/ci-cache
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Cache npm cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: /work/ci-cache/npm
+          key: npm-linux-x64-24-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check
+      - run: npm test
+
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Report the toolchain
+        run: kustomize version
+      - name: Check manifests
+        run: tools/check-manifests.sh
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select an amd64 BuildKit replica
+        id: amd64
+        uses: https://git.tumidanski/ci/actions/select-amd64-builder@v1
+        with:
+          index: 0
+
+      - name: Build image (no push)
+        uses: https://git.tumidanski/ci/actions/buildx-build@v1
+        with:
+          context: .
+          dockerfile: Dockerfile
+          image: registry.tumidanski/jtumidanski/portfolio
+          tags: pr-${{ github.event.pull_request.number }}
+          platform: linux/amd64
+          buildkit-endpoint: ${{ steps.amd64.outputs.endpoint }}
+          push: 'false'
+          cache-scope: portfolio-amd64
