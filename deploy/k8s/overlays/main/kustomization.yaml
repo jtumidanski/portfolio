@@ -13,4 +13,4 @@ images:
   - name: registry.tumidanski/jtumidanski/portfolio
     # Placeholder until the first main run pins a real SHA. Not numeric on
     # purpose: kustomize rejects an unquoted all-digit tag as a number.
-    newTag: f34fe70295b32b87c314f0a906e6c889e70451d8
+    newTag: b509860fdb23db2274f714988053095a9e5898ce
