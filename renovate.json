@@ -8,8 +8,24 @@
   "packageRules": [
     { "matchManagers": ["npm"], "matchUpdateTypes": ["minor", "patch"], "groupName": "npm dependencies (non-major)" },
     { "matchManagers": ["github-actions"], "matchUpdateTypes": ["minor", "patch"], "groupName": "GitHub Actions (non-major)" },
-    { "matchManagers": ["dockerfile"], "matchUpdateTypes": ["patch"], "groupName": "Dockerfile base images (patch)" },
-    { "matchUpdateTypes": ["major"], "automerge": false, "labels": ["dependencies", "major"] }
+    {
+      "description": "Base images use floating tags (node:24-alpine, nginx-unprivileged:alpine) with no patch versions to bump. Pin them by digest so builds are reproducible and upstream rebuilds arrive as PRs. Digests carry no release timestamp, so the release-age wait would hold them forever.",
+      "matchManagers": ["dockerfile"],
+      "pinDigests": true
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["pin", "digest", "patch"],
+      "groupName": "Dockerfile base images",
+      "minimumReleaseAge": null
+    },
+    { "matchUpdateTypes": ["major"], "automerge": false, "labels": ["dependencies", "major"] },
+    {
+      "description": "Hold TypeScript below v7 until typescript-eslint supports the native port. Lift once typescript-eslint declares v7 compatibility.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
+    }
   ],
   "osvVulnerabilityAlerts": true
 }
